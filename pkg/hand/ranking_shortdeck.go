@@ -5,44 +5,44 @@ import (
 )
 
 const (
-	// HighCard represents a hand composed of no pairs, straights, or flushes.
+	// SDHighCard represents a hand composed of no pairs, straights, or flushes.
 	// Ex: A♠ K♠ J♣ 7♥ 5♦
 	SDHighCard Ranking = iota + 1
 
-	// Pair represents a hand composed of a single pair.
+	// SDPair represents a hand composed of a single pair.
 	// Ex: A♠ A♣ K♣ J♥ 5♦
 	SDPair
 
-	// TwoPair represents a hand composed of two pairs.
+	// SDTwoPair represents a hand composed of two pairs.
 	// Ex: A♠ A♣ J♣ J♦ 5♦
 	SDTwoPair
 
-	// ThreeOfAKind represents a hand composed of three of the same rank.
+	// SDThreeOfAKind represents a hand composed of three of the same rank.
 	// Ex: A♠ A♣ A♦ J♥ 5♦
 	SDThreeOfAKind
 
-	// Straight represents a hand composed of five cards of consecutive rank.
+	// SDStraight represents a hand composed of five cards of consecutive rank.
 	// Ex: A♠ K♣ Q♦ J♥ T♦
 	SDStraight
 
-	// FullHouse represents a hand composed of three of a kind and a pair.
+	// SDFullHouse represents a hand composed of three of a kind and a pair.
 	// Ex: 4♠ 4♣ 4♦ 2♠ 2♥
 	SDFullHouse
 
-	// Flush represents a hand composed of five cards that share the same suit.
+	// SDFlush represents a hand composed of five cards that share the same suit.
 	// Ex: T♠ 7♠ 4♠ 3♠ 2♠
 	SDFlush
 
-	// FourOfAKind represents a hand composed of four cards of the same rank.
+	// SDFourOfAKind represents a hand composed of four cards of the same rank.
 	// Ex: A♠ A♣ A♦ A♥ 5♥
 	SDFourOfAKind
 
-	// StraightFlush represents a hand composed of five cards of consecutive
+	// SDStraightFlush represents a hand composed of five cards of consecutive
 	// rank that share the same suit.
 	// Ex: 5♥ 4♥ 3♥ 2♥ A♥
 	SDStraightFlush
 
-	// RoyalFlush represents a hand composed of ace, king, queen, jack, and ten
+	// SDRoyalFlush represents a hand composed of ace, king, queen, jack, and ten
 	// of the same suit.
 	// Ex: A♥ K♥ Q♥ J♥ T♥
 	SDRoyalFlush

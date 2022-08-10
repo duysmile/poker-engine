@@ -1,10 +1,9 @@
 package jokertest_test
 
 import (
+	"github.com/notnil/joker/pkg/hand"
+	"github.com/notnil/joker/pkg/jokertest"
 	"testing"
-
-	"github.com/notnil/joker/hand"
-	"github.com/notnil/joker/jokertest"
 )
 
 func TestDeck(t *testing.T) {

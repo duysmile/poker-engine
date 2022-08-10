@@ -95,7 +95,7 @@ func card(s string) hand.Card {
 		panic("jokertest: suit not found")
 	}
 
-	for _, c := range hand.Cards() {
+	for _, c := range hand.StandardCards() {
 		if rank == c.Rank() && suit == c.Suit() {
 			return c
 		}

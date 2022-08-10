@@ -1,10 +1,9 @@
 package table_test
 
 import (
+	"github.com/notnil/joker/pkg/jokertest"
+	"github.com/notnil/joker/pkg/table"
 	"testing"
-
-	"github.com/notnil/joker/jokertest"
-	"github.com/notnil/joker/table"
 )
 
 func TestTable(t *testing.T) {

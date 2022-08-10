@@ -5,44 +5,44 @@ import (
 )
 
 const (
-	// HighCard represents a hand composed of no pairs, straights, or flushes.
+	// StdHighCard represents a hand composed of no pairs, straights, or flushes.
 	// Ex: A♠ K♠ J♣ 7♥ 5♦
 	StdHighCard Ranking = iota + 1
 
-	// Pair represents a hand composed of a single pair.
+	// StdPair represents a hand composed of a single pair.
 	// Ex: A♠ A♣ K♣ J♥ 5♦
 	StdPair
 
-	// TwoPair represents a hand composed of two pairs.
+	// StdTwoPair represents a hand composed of two pairs.
 	// Ex: A♠ A♣ J♣ J♦ 5♦
 	StdTwoPair
 
-	// ThreeOfAKind represents a hand composed of three of the same rank.
+	// StdThreeOfAKind represents a hand composed of three of the same rank.
 	// Ex: A♠ A♣ A♦ J♥ 5♦
 	StdThreeOfAKind
 
-	// Straight represents a hand composed of five cards of consecutive rank.
+	// StdStraight represents a hand composed of five cards of consecutive rank.
 	// Ex: A♠ K♣ Q♦ J♥ T♦
 	StdStraight
 
-	// Flush represents a hand composed of five cards that share the same suit.
+	// StdFlush represents a hand composed of five cards that share the same suit.
 	// Ex: T♠ 7♠ 4♠ 3♠ 2♠
 	StdFlush
 
-	// FullHouse represents a hand composed of three of a kind and a pair.
+	// StdFullHouse represents a hand composed of three of a kind and a pair.
 	// Ex: 4♠ 4♣ 4♦ 2♠ 2♥
 	StdFullHouse
 
-	// FourOfAKind represents a hand composed of four cards of the same rank.
+	// StdFourOfAKind represents a hand composed of four cards of the same rank.
 	// Ex: A♠ A♣ A♦ A♥ 5♥
 	StdFourOfAKind
 
-	// StraightFlush represents a hand composed of five cards of consecutive
+	// StdStraightFlush represents a hand composed of five cards of consecutive
 	// rank that share the same suit.
 	// Ex: 5♥ 4♥ 3♥ 2♥ A♥
 	StdStraightFlush
 
-	// RoyalFlush represents a hand composed of ace, king, queen, jack, and ten
+	// StdRoyalFlush represents a hand composed of ace, king, queen, jack, and ten
 	// of the same suit.
 	// Ex: A♥ K♥ Q♥ J♥ T♥
 	StdRoyalFlush
