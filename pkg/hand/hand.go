@@ -8,55 +8,6 @@ import (
 	"github.com/notnil/joker/util"
 )
 
-// A Ranking is one of the ten possible hand rankings that determine the
-// value of a hand.  Hand rankings are composed of different arrangments of
-// pairs, straights, and flushes.
-type Ranking int
-
-const (
-	// HighCard represents a hand composed of no pairs, straights, or flushes.
-	// Ex: A♠ K♠ J♣ 7♥ 5♦
-	HighCard Ranking = iota + 1
-
-	// Pair represents a hand composed of a single pair.
-	// Ex: A♠ A♣ K♣ J♥ 5♦
-	Pair
-
-	// TwoPair represents a hand composed of two pairs.
-	// Ex: A♠ A♣ J♣ J♦ 5♦
-	TwoPair
-
-	// ThreeOfAKind represents a hand composed of three of the same rank.
-	// Ex: A♠ A♣ A♦ J♥ 5♦
-	ThreeOfAKind
-
-	// Straight represents a hand composed of five cards of consecutive rank.
-	// Ex: A♠ K♣ Q♦ J♥ T♦
-	Straight
-
-	// Flush represents a hand composed of five cards that share the same suit.
-	// Ex: T♠ 7♠ 4♠ 3♠ 2♠
-	Flush
-
-	// FullHouse represents a hand composed of three of a kind and a pair.
-	// Ex: 4♠ 4♣ 4♦ 2♠ 2♥
-	FullHouse
-
-	// FourOfAKind represents a hand composed of four cards of the same rank.
-	// Ex: A♠ A♣ A♦ A♥ 5♥
-	FourOfAKind
-
-	// StraightFlush represents a hand composed of five cards of consecutive
-	// rank that share the same suit.
-	// Ex: 5♥ 4♥ 3♥ 2♥ A♥
-	StraightFlush
-
-	// RoyalFlush represents a hand composed of ace, king, queen, jack, and ten
-	// of the same suit.
-	// Ex: A♥ K♥ Q♥ J♥ T♥
-	RoyalFlush
-)
-
 // Sorting is the sorting used to determine which hand is
 // selected.
 type Sorting int
@@ -86,6 +37,7 @@ type Config struct {
 	ignoreStraights bool
 	ignoreFlushes   bool
 	aceIsLow        bool
+	gameType        GameType
 }
 
 type configJSON struct {
@@ -132,6 +84,10 @@ func AceToFiveLow(c *Config) {
 	c.aceIsLow = true
 	c.ignoreStraights = true
 	c.ignoreFlushes = true
+}
+
+func ShortDeck(c *Config) {
+	c.gameType = GameTypeShortDeck
 }
 
 // A Hand is the highest poker hand derived from five or more cards.
@@ -276,6 +232,7 @@ func (a byHighHand) Less(i, j int) bool {
 
 func handForFiveCards(cards []Card, c Config) *Hand {
 	cards = formCards(cards, c)
+	rankings := getRankingsByType(c.gameType)
 	for _, r := range rankings {
 		if r.vFunc(cards, c) {
 			return &Hand{
@@ -306,160 +263,20 @@ func cardCombos(cards []Card) [][]Card {
 	return cCombo
 }
 
-type ranking struct {
-	r     Ranking
-	vFunc validFunc
-	dFunc descFunc
+func formLowStraight(cards []Card) []Card {
+	if len(cards) < 5 {
+		return cards
+	}
+	has := cards[0].Rank() == Ace &&
+		cards[1].Rank() == Five &&
+		cards[2].Rank() == Four &&
+		cards[3].Rank() == Three &&
+		cards[4].Rank() == Two
+	if has {
+		cards = []Card{cards[1], cards[2], cards[3], cards[4], cards[0]}
+	}
+	return cards
 }
-
-type validFunc func([]Card, Config) bool
-type descFunc func([]Card) string
-
-var (
-	highCard = ranking{
-		r: HighCard,
-		vFunc: func(cards []Card, c Config) bool {
-			flush := hasFlush(cards)
-			straight := hasStraight(cards)
-			pairs := hasPairs(cards, []int{1, 1, 1, 1, 1})
-			if !c.ignoreStraights {
-				pairs = pairs && !straight
-			}
-			if !c.ignoreFlushes {
-				pairs = pairs && !flush
-			}
-			return pairs
-		},
-		dFunc: func(cards []Card) string {
-			r := cards[0].Rank()
-			return fmt.Sprintf("high card %v high", r.singularName())
-		},
-	}
-
-	pair = ranking{
-		r: Pair,
-		vFunc: func(cards []Card, c Config) bool {
-			return hasPairs(cards, []int{2, 2, 1, 1, 1})
-		},
-		dFunc: func(cards []Card) string {
-			r := cards[0].Rank()
-			return fmt.Sprintf("pair of %v", r.pluralName())
-		},
-	}
-
-	twoPair = ranking{
-		r: TwoPair,
-		vFunc: func(cards []Card, c Config) bool {
-			return hasPairs(cards, []int{2, 2, 2, 2, 1})
-		},
-		dFunc: func(cards []Card) string {
-			r1 := cards[0].Rank()
-			r2 := cards[2].Rank()
-			return fmt.Sprintf("two pair %v and %v", r1.pluralName(), r2.pluralName())
-		},
-	}
-
-	threeOfAKind = ranking{
-		r: ThreeOfAKind,
-		vFunc: func(cards []Card, c Config) bool {
-			return hasPairs(cards, []int{3, 3, 3, 1, 1})
-		},
-		dFunc: func(cards []Card) string {
-			r := cards[0].Rank()
-			return fmt.Sprintf("three of a kind %v", r.pluralName())
-		},
-	}
-
-	straight = ranking{
-		r: Straight,
-		vFunc: func(cards []Card, c Config) bool {
-			if c.ignoreStraights {
-				return false
-			}
-			flush := hasFlush(cards)
-			straight := hasStraight(cards)
-			return !flush && straight
-		},
-		dFunc: func(cards []Card) string {
-			r := cards[0].Rank()
-			return fmt.Sprintf("straight %v high", r.singularName())
-		},
-	}
-
-	flush = ranking{
-		r: Flush,
-		vFunc: func(cards []Card, c Config) bool {
-			if c.ignoreFlushes {
-				return false
-			}
-
-			flush := hasFlush(cards)
-			straight := hasStraight(cards)
-			return flush && !straight
-		},
-		dFunc: func(cards []Card) string {
-			r1 := cards[0].Rank()
-			return fmt.Sprintf("flush %v high", r1.singularName())
-		},
-	}
-
-	fullHouse = ranking{
-		r: FullHouse,
-		vFunc: func(cards []Card, c Config) bool {
-			return hasPairs(cards, []int{3, 3, 3, 2, 2})
-		},
-		dFunc: func(cards []Card) string {
-			r1 := cards[0].Rank()
-			r2 := cards[3].Rank()
-			return fmt.Sprintf("full house %v full of %v", r1.pluralName(), r2.pluralName())
-		},
-	}
-
-	fourOfAKind = ranking{
-		r: FourOfAKind,
-		vFunc: func(cards []Card, c Config) bool {
-			return hasPairs(cards, []int{4, 4, 4, 4, 1})
-		},
-		dFunc: func(cards []Card) string {
-			r := cards[0].Rank()
-			return fmt.Sprintf("four of a kind %v", r.pluralName())
-		},
-	}
-
-	straightFlush = ranking{
-		r: StraightFlush,
-		vFunc: func(cards []Card, c Config) bool {
-			if c.ignoreStraights || c.ignoreFlushes {
-				return false
-			}
-			flush := hasFlush(cards)
-			straight := hasStraight(cards)
-			return cards[0].Rank() != Ace && flush && straight
-		},
-		dFunc: func(cards []Card) string {
-			r := cards[0].Rank()
-			return fmt.Sprintf("straight flush %v high", r.singularName())
-		},
-	}
-
-	royalFlush = ranking{
-		r: RoyalFlush,
-		vFunc: func(cards []Card, c Config) bool {
-			if c.ignoreStraights || c.ignoreFlushes {
-				return false
-			}
-			flush := hasFlush(cards)
-			straight := hasStraight(cards)
-			return cards[0].Rank() == Ace && flush && straight
-		},
-		dFunc: func(cards []Card) string {
-			return "royal flush"
-		},
-	}
-
-	rankings = []ranking{highCard, pair, twoPair, threeOfAKind,
-		straight, flush, fullHouse, fourOfAKind, straightFlush, royalFlush}
-)
 
 func formCards(cards []Card, c Config) []Card {
 	var ranks []Rank
@@ -489,69 +306,6 @@ func formCards(cards []Card, c Config) []Card {
 	}
 	// check for low straight
 	return formLowStraight(formed)
-}
-
-func hasPairs(cards []Card, pairNums []int) bool {
-	for i := 0; i < 5; i++ {
-		num := pairNums[i]
-		if i >= len(cards) {
-			return num == 1
-		}
-		card := cards[i]
-		if num != len(cardsForRank(cards, card.Rank())) {
-			return false
-		}
-	}
-	return true
-}
-
-func hasFlush(cards []Card) bool {
-	if len(cards) != 5 {
-		return false
-	}
-	suit := cards[0].Suit()
-	has := true
-	for _, c := range cards {
-		has = has && c.Suit() == suit
-	}
-	return has
-}
-
-func hasStraight(cards []Card) bool {
-	if len(cards) != 5 {
-		return false
-	}
-	lastIndex := cards[0].Rank()
-	straight := true
-	for i := 1; i < 5; i++ {
-		index := cards[i].Rank()
-		straight = straight && (lastIndex == index+1)
-		lastIndex = index
-	}
-	return straight || hasLowStraight(cards)
-}
-
-func hasLowStraight(cards []Card) bool {
-	return cards[0].Rank() == Five &&
-		cards[1].Rank() == Four &&
-		cards[2].Rank() == Three &&
-		cards[3].Rank() == Two &&
-		cards[4].Rank() == Ace
-}
-
-func formLowStraight(cards []Card) []Card {
-	if len(cards) < 5 {
-		return cards
-	}
-	has := cards[0].Rank() == Ace &&
-		cards[1].Rank() == Five &&
-		cards[2].Rank() == Four &&
-		cards[3].Rank() == Three &&
-		cards[4].Rank() == Two
-	if has {
-		cards = []Card{cards[1], cards[2], cards[3], cards[4], cards[0]}
-	}
-	return cards
 }
 
 func cardsForRank(cards []Card, r Rank) []Card {

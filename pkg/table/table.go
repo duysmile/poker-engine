@@ -3,8 +3,7 @@ package table
 import (
 	"encoding/json"
 	"errors"
-
-	"github.com/notnil/joker/hand"
+	"github.com/notnil/joker/pkg/hand"
 )
 
 var (

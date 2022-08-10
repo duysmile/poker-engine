@@ -5,6 +5,14 @@ import (
 	"strings"
 )
 
+// GameType describe deck by game type
+type GameType int
+
+const (
+	GameTypeStandard GameType = iota
+	GameTypeShortDeck
+)
+
 // Deck is a slice of cards used for dealing
 type Deck struct {
 	Cards []Card
@@ -68,16 +76,29 @@ type Dealer interface {
 
 // NewDealer returns a dealer that generates shuffled decks
 // with the given random source.
-func NewDealer(r *rand.Rand) Dealer {
-	return dealer{r: r}
+func NewDealer(r *rand.Rand, gameType GameType) Dealer {
+	return dealer{
+		r:        r,
+		gameType: gameType,
+	}
 }
 
 type dealer struct {
-	r *rand.Rand
+	r        *rand.Rand
+	gameType GameType
 }
 
 func (d dealer) Deck() *Deck {
-	cards := shuffleCards(d.r, Cards())
+	var allCards []Card
+	switch d.gameType {
+	case GameTypeShortDeck:
+		allCards = ShortDeckCards()
+	case GameTypeStandard:
+		allCards = StandardCards()
+	default:
+		allCards = StandardCards()
+	}
+	cards := shuffleCards(d.r, allCards)
 	return &Deck{Cards: cards}
 }
 

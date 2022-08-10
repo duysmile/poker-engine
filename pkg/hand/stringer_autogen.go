@@ -2,7 +2,9 @@
 
 package hand
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const _Ranking_name = "HighCardPairTwoPairThreeOfAKindStraightFlushFullHouseFourOfAKindStraightFlushRoyalFlush"
 

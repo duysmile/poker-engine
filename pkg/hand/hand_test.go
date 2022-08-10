@@ -2,11 +2,10 @@ package hand_test
 
 import (
 	"encoding/json"
+	"github.com/notnil/joker/pkg/hand"
+	. "github.com/notnil/joker/pkg/jokertest"
 	"math/rand"
 	"testing"
-
-	"github.com/notnil/joker/hand"
-	. "github.com/notnil/joker/jokertest"
 )
 
 type testPair struct {
@@ -20,79 +19,79 @@ var tests = []testPair{
 	{
 		Cards("Ks", "Qs", "Js", "As", "9d"),
 		Cards("As", "Ks", "Qs", "Js", "9d"),
-		hand.HighCard,
+		hand.StdHighCard,
 		"high card ace high",
 	},
 	{
 		Cards("Ks", "Qh", "Qs", "Js", "9d"),
 		Cards("Qh", "Qs", "Ks", "Js", "9d"),
-		hand.Pair,
+		hand.StdPair,
 		"pair of queens",
 	},
 	{
 		Cards("2s", "Qh", "Qs", "Js", "2d"),
 		Cards("Qh", "Qs", "2s", "2d", "Js"),
-		hand.TwoPair,
+		hand.StdTwoPair,
 		"two pair queens and twos",
 	},
 	{
 		Cards("6s", "Qh", "Ks", "6h", "6d"),
 		Cards("6s", "6h", "6d", "Ks", "Qh"),
-		hand.ThreeOfAKind,
+		hand.StdThreeOfAKind,
 		"three of a kind sixes",
 	},
 	{
 		Cards("Ks", "Qs", "Js", "As", "Td"),
 		Cards("As", "Ks", "Qs", "Js", "Td"),
-		hand.Straight,
+		hand.StdStraight,
 		"straight ace high",
 	},
 	{
 		Cards("2s", "3s", "4s", "As", "5d"),
 		Cards("5d", "4s", "3s", "2s", "As"),
-		hand.Straight,
+		hand.StdStraight,
 		"straight five high",
 	},
 	{
 		Cards("7s", "4s", "5s", "3s", "2s"),
 		Cards("7s", "5s", "4s", "3s", "2s"),
-		hand.Flush,
+		hand.StdFlush,
 		"flush seven high",
 	},
 	{
 		Cards("7s", "7d", "3s", "3d", "7h"),
 		Cards("7s", "7d", "7h", "3s", "3d"),
-		hand.FullHouse,
+		hand.StdFullHouse,
 		"full house sevens full of threes",
 	},
 	{
 		Cards("7s", "7d", "3s", "7c", "7h"),
 		Cards("7s", "7d", "7c", "7h", "3s"),
-		hand.FourOfAKind,
+		hand.StdFourOfAKind,
 		"four of a kind sevens",
 	},
 	{
 		Cards("Ks", "Qs", "Js", "Ts", "9s"),
 		Cards("Ks", "Qs", "Js", "Ts", "9s"),
-		hand.StraightFlush,
+		hand.StdStraightFlush,
 		"straight flush king high",
 	},
 	{
 		Cards("As", "5s", "4s", "3s", "2s"),
 		Cards("5s", "4s", "3s", "2s", "As"),
-		hand.StraightFlush,
+		hand.StdStraightFlush,
 		"straight flush five high",
 	},
 	{
 		Cards("As", "Ks", "Qs", "Js", "Ts"),
 		Cards("As", "Ks", "Qs", "Js", "Ts"),
-		hand.RoyalFlush,
+		hand.StdRoyalFlush,
 		"royal flush",
 	},
 	{
 		Cards("As", "Ks", "Qs", "2s", "2c", "2h", "2d"),
 		Cards("2s", "2c", "2h", "2d", "As"),
-		hand.FourOfAKind,
+		hand.StdFourOfAKind,
 		"four of a kind twos",
 	},
 }
@@ -178,21 +177,21 @@ var optTests = []testOptionsPairs{
 		Cards("Ks", "Qs", "Js", "As", "9s"),
 		Cards("As", "Ks", "Qs", "Js", "9s"),
 		[]func(*hand.Config){hand.Low},
-		hand.Flush,
+		hand.StdFlush,
 		"flush ace high",
 	},
 	{
 		Cards("7h", "6h", "5s", "4s", "2s", "3s"),
 		Cards("6h", "5s", "4s", "3s", "2s"),
 		[]func(*hand.Config){hand.AceToFiveLow},
-		hand.HighCard,
+		hand.StdHighCard,
 		"high card six high",
 	},
 	{
 		Cards("Ah", "6h", "5s", "4s", "2s", "Ks"),
 		Cards("6h", "5s", "4s", "2s", "Ah"),
 		[]func(*hand.Config){hand.AceToFiveLow},
-		hand.HighCard,
+		hand.StdHighCard,
 		"high card six high",
 	},
 }
@@ -218,20 +217,20 @@ func TestHandsWithOptions(t *testing.T) {
 func TestBlanks(t *testing.T) {
 	cards := []hand.Card{hand.AceSpades}
 	h := hand.New(cards)
-	if h.Ranking() != hand.HighCard {
+	if h.Ranking() != hand.StdHighCard {
 		t.Fatal("blank card error")
 	}
 
 	cards = []hand.Card{hand.FiveSpades, hand.FiveClubs}
 	h = hand.New(cards)
-	if h.Ranking() != hand.Pair {
+	if h.Ranking() != hand.StdPair {
 		t.Fatal("blank card error")
 	}
 }
 
 func TestDeck(t *testing.T) {
 	r := rand.New(rand.NewSource(0))
-	deck := hand.NewDealer(r).Deck()
+	deck := hand.NewDealer(r, hand.GameTypeStandard).Deck()
 	if deck.Pop() == deck.Pop() {
 		t.Fatal("Two Pop() calls should never return the same result")
 	}
@@ -242,7 +241,7 @@ func TestDeck(t *testing.T) {
 }
 
 func TestHandJSON(t *testing.T) {
-	jsonStr := `{"ranking":10,"cards":["A♠","K♠","Q♠","J♠","T♠"],"description":"royal flush","config":{"sorting":1,"ignoreStraights":false,"ignoreFlushes":false,"aceIsLow":false}}`
+	jsonStr := `{"standard":10,"cards":["A♠","K♠","Q♠","J♠","T♠"],"description":"royal flush","config":{"sorting":1,"ignoreStraights":false,"ignoreFlushes":false,"aceIsLow":false}}`
 	h := &hand.Hand{}
 	if err := json.Unmarshal([]byte(jsonStr), h); err != nil {
 		t.Fatal(err)
@@ -258,7 +257,7 @@ func TestHandJSON(t *testing.T) {
 
 func BenchmarkHandCreation(b *testing.B) {
 	r := rand.New(rand.NewSource(0))
-	cards := hand.NewDealer(r).Deck().PopMulti(7)
+	cards := hand.NewDealer(r, hand.GameTypeStandard).Deck().PopMulti(7)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		hand.New(cards)

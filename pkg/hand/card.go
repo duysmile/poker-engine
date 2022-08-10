@@ -208,8 +208,8 @@ func (c *Card) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// Cards returns all 52 unshuffled cards
-func Cards() []Card {
+// StandardCards returns all 52 unshuffled cards
+func StandardCards() []Card {
 	return []Card{
 		AceSpades, KingSpades, QueenSpades, JackSpades, TenSpades,
 		NineSpades, EightSpades, SevenSpades, SixSpades, FiveSpades,
@@ -226,6 +226,23 @@ func Cards() []Card {
 		AceClubs, KingClubs, QueenClubs, JackClubs, TenClubs,
 		NineClubs, EightClubs, SevenClubs, SixClubs, FiveClubs,
 		FourClubs, ThreeClubs, TwoClubs,
+	}
+}
+
+// ShortDeckCards returns 36 unshuffled cards without cards from 2->5
+func ShortDeckCards() []Card {
+	return []Card{
+		AceSpades, KingSpades, QueenSpades, JackSpades, TenSpades,
+		NineSpades, EightSpades, SevenSpades, SixSpades,
+
+		AceHearts, KingHearts, QueenHearts, JackHearts, TenHearts,
+		NineHearts, EightHearts, SevenHearts, SixHearts,
+
+		AceDiamonds, KingDiamonds, QueenDiamonds, JackDiamonds, TenDiamonds,
+		NineDiamonds, EightDiamonds, SevenDiamonds, SixDiamonds,
+
+		AceClubs, KingClubs, QueenClubs, JackClubs, TenClubs,
+		NineClubs, EightClubs, SevenClubs, SixClubs,
 	}
 }
 

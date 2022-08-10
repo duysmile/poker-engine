@@ -1,9 +1,8 @@
 package jokertest
 
 import (
+	"github.com/notnil/joker/pkg/hand"
 	"strings"
-
-	"github.com/notnil/joker/hand"
 )
 
 const (

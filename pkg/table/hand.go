@@ -2,9 +2,8 @@ package table
 
 import (
 	"errors"
+	"github.com/notnil/joker/pkg/hand"
 	"sort"
-
-	"github.com/notnil/joker/hand"
 )
 
 var (
