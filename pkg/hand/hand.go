@@ -278,6 +278,21 @@ func formLowStraight(cards []Card) []Card {
 	return cards
 }
 
+func formLowSDStraight(cards []Card) []Card {
+	if len(cards) < 5 {
+		return cards
+	}
+	has := cards[0].Rank() == Ace &&
+		cards[1].Rank() == Nine &&
+		cards[2].Rank() == Eight &&
+		cards[3].Rank() == Seven &&
+		cards[4].Rank() == Six
+	if has {
+		cards = []Card{cards[1], cards[2], cards[3], cards[4], cards[0]}
+	}
+	return cards
+}
+
 func formCards(cards []Card, c Config) []Card {
 	var ranks []Rank
 	if c.aceIsLow {
@@ -305,7 +320,14 @@ func formCards(cards []Card, c Config) []Card {
 		}
 	}
 	// check for low straight
-	return formLowStraight(formed)
+	switch c.gameType {
+	case GameTypeShortDeck:
+		return formLowSDStraight(formed)
+	case GameTypeStandard:
+		fallthrough
+	default:
+		return formLowStraight(formed)
+	}
 }
 
 func cardsForRank(cards []Card, r Rank) []Card {
